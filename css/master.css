@@ -1,0 +1,94 @@
+body {
+    font-family: arial, verdana, sans-serif;
+}
+
+
+core-header-panel {
+    background: #ffffff;
+}
+
+.google-map {
+    width: 100%;
+    height: 100%;
+}
+
+.flex-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-item {
+    flex: 1 1 auto;
+}
+
+#main_toolbar, #drawer_toolbar {
+    background: #1797d7;
+    color: #ffffff;
+}
+
+#main_placesearch {
+    background: #f4f6f8;
+    max-width: 10em;
+    padding: 5px 10px;
+    border-radius: 17px;
+    box-shadow: inset -1px -1px 3px 0 #4c4c4c;
+}
+
+#drawer_locs:after {
+    display: block;
+    content: '';
+    width: 104px;
+    height: 16px;
+    background-image: url(../img/powered-by-google-on-white.png);
+}
+
+#overlay {
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: #ffffff;
+    z-index: 1000;
+}
+
+#overlay_backdrop {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+#overlay_outer {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    background: #ffffff;
+}
+
+#overlay_inner {
+    width: 100%;
+    height: 100%;
+}
+
+#overlay_head {
+    font-size: 1em;
+    padding: 0.5em;
+    color: #ffffff;
+    background: #1797d7;
+}
+
+#overlay_body {
+    height: 100%;
+    overflow-y: auto;
+    padding: 0.5em;
+    color: #000000;
+}
+
+.extinfo-link {
+    float: right;
+    position: relative;
+    top: -1em;
+    background: #ffffff;
+    text-decoration: none;
+    color: #1797d7;
+}

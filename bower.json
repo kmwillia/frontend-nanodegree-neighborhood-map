@@ -1,0 +1,31 @@
+{
+  "name": "New folder",
+  "version": "0.0.0",
+  "authors": [
+    "Kevin Williams <kmwillia@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "core-component-page": "Polymer/core-component-page#^0.5",
+    "jquery": "~2.1.3",
+    "knockout": "~3.2.0",
+    "polymer": "Polymer/polymer#~0.5.5",
+    "core-menu": "Polymer/core-menu#~0.5.5",
+    "core-scaffold": "Polymer/core-scaffold#~0.5.5",
+    "paper-input": "Polymer/paper-input#~0.5.5",
+    "core-input": "Polymer/core-input#~0.5.5",
+    "core-pages": "Polymer/core-pages#~0.5.5",
+    "google-map": "GoogleWebComponents/google-map#~0.4.1",
+    "core-overlay": "Polymer/core-overlay#~0.5.5",
+    "core-transition": "Polymer/core-transition#~0.5.5",
+    "paper-item": "Polymer/paper-item#~0.5.5"
+  }
+}

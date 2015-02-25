@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Neighborhood Map</title>
+        <!-- CSS -->
+        <link rel="stylesheet" href="css/master.css" shim-shadowdom>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <!-- Polymer Imports -->
+        <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+        <link rel="import" href="bower_components/core-drawer-panel/core-drawer-panel.html">
+        <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+        <link rel="import" href="bower_components/core-icons/core-icons.html">
+        <link rel="import" href="bower_components/core-icons/image-icons.html">
+        <link rel="import" href="bower_components/core-icons/maps-icons.html">
+        <link rel="import" href="bower_components/core-input/core-input.html">
+        <link rel="import" href="bower_components/core-item/core-item.html">
+        <link rel="import" href="bower_components/core-menu/core-menu.html">
+        <link rel="import" href="bower_components/core-overlay/core-overlay.html">
+        <link rel="import" href="bower_components/core-pages/core-pages.html">
+        <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
+        <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
+        <link rel="import" href="bower_components/google-map/google-map.html">
+        <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+        <link rel="import" href="bower_components/paper-item/paper-item.html">
+        <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+    </head>
+    <body fullbleed vertical layout unresolved>
+        <!-- Polymer -->
+        <core-drawer-panel>
+            <!-- Drawer -->
+            <core-header-panel drawer>
+                <core-toolbar id="drawer_toolbar">
+                    <span flex>Places</span>
+                </core-toolbar>
+                <core-menu id="drawer_locs" data-bind="foreach: filteredLocations">
+                    <core-item data-bind="attr: {label: name}, click: onClick" horizontal center layout></core-item>
+                </core-menu>
+            </core-header-panel>
+            <!-- Main -->
+            <core-header-panel flex main>
+                <core-toolbar id="main_toolbar" class="medium-tall">
+                    <paper-icon-button id="navicon" icon="menu" core-drawer-toggle></paper-icon-button>
+                    <span data-bind="text: city.name" flex></span>
+                    <input id="main_placesearch" is="core-input" placeholder="Search Places" />
+                    <paper-tabs class="bottom fit" selected=0 data-bind="foreach: filters" horizontal center layout>
+                        <paper-tab data-bind="text: name, icon: icon"></paper-tab>
+                    </paper-tabs>
+                </core-toolbar>
+                <google-map id="map-canvas" fit></google-map>
+            </core-header-panel>
+        </core-drawer-panel>
+        <!-- Overlay -->
+        <div id="overlay" data-bind="visible: overlayOpen">
+            <div id="overlay_backdrop"></div>
+            <div id="overlay_outer">
+                <div id="overlay_inner" class="flex-box">
+                    <div id="overlay_head" class="flex-item" data-bind="text: overlayTitle"></div>
+                    <div id="overlay_body" class="flex-item" data-bind="html: overlayContent"></div>
+                </div>
+            </div>
+        </div>
+        <!-- JS -->
+        <script src="bower_components/knockout/dist/knockout.js"></script>
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="js/api_keys.js"></script>
+        <script src="js/viewmodel.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/map.js"></script>
+        <script src="js/wikipedia.js"></script>
+    </body>
+</html>
