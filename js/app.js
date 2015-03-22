@@ -8,7 +8,11 @@ $(function() {
 
     //Init map
     initializeMap();
+    var load = setTimeout(function() {
+        alert('Google Maps API failed to load within 5 seconds.\nPlease try again.');
+    }, 5000);
     googleMap.addEventListener('google-map-ready', function(e) {
+        clearTimeout(load);
         loadMapPlaces();
     });
 
@@ -27,6 +31,10 @@ $(function() {
     });
 
     //Attach events to search box
+    $('#searchicon').click(function(e) {
+        $('#main_placesearch').toggleClass('open');
+    });
+
     $('#main_placesearch').keyup(function(e) {
         LVM.searchString(e.target.value);
         LVM.filterLocations();

@@ -26,12 +26,25 @@ core-header-panel {
     color: #ffffff;
 }
 
+#search-container {
+    background: #1797d7;
+}
+
+#search-container.open{
+    width: 100%;
+}
+
 #main_placesearch {
     background: #f4f6f8;
-    max-width: 10em;
+    max-width: calc(50% - 40px);
+    display: none;
     padding: 5px 10px;
     border-radius: 17px;
     box-shadow: inset -1px -1px 3px 0 #4c4c4c;
+}
+
+#main_placesearch.open {
+    display: initial;
 }
 
 #drawer_locs:after {

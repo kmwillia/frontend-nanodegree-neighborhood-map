@@ -32,7 +32,7 @@ function loadMapPlaces() {
 
             LVM.addLocations(results);
             LVM.filterLocations();
-
+            //Get all pages of results (max 60 results, from 3 pages)
             if(nextPageToken.hasNextPage) {
                 setTimeout(function() {
                     nextPageToken.nextPage();
@@ -61,7 +61,7 @@ function Location(placeResult) {
     this.urls = {};
 
     //Create Google Maps marker for this
-    var markerIcon = {
+    this.markerIcon = {
         url: this.icon,
         scaledSize: new google.maps.Size(24,24),
         visible: this.types.anyExist(LVM.filter().keywords)
@@ -71,7 +71,7 @@ function Location(placeResult) {
         title: this.name,
         position: this.position,
         visible: true,
-        icon: markerIcon
+        icon: this.markerIcon
     });
     //Add Click to Marker
     google.maps.event.addListener(
@@ -87,20 +87,53 @@ function Location(placeResult) {
 
 //Click handler for Location
 Location.prototype.onClick = function() {
+    //Reset any changed markers
+    var locs = LVM.allLocations();
+    for(var i = 0; i < locs.length; i++) {
+        var loc = locs[i];
+        loc.marker.icon = loc.markerIcon;
+        loc.marker.setMap(null);
+        loc.marker.setMap(googleMap.map);
+    }
+    //Update this marker
+    this.marker.icon = null;
+    this.marker.setMap(null);
+    this.marker.setMap(googleMap.map);
+
     //Query data from API(s) if necessary
     if(!this.blurbs.wiki) {
         wiki = wiki || new Wikipedia();
-        wiki.query(this.name, (function(loc) {
-            return function(results, status) {
-                if(status === 'success') {
-                    var page = results.query.pages[Object.keys(results.query.pages)[0]];
-                    loc.blurbs.wiki = page.extract || '<p>No Wikipedia results found</p>';
-                    loc.urls.wiki = 'http://en.wikipedia.org/wiki/' + page.title;
+        wiki.query(
+            this.name,
+            (function(loc) {
+                return function(results, status) {
+                    if(status === 'success') {
+                        var page = results.query.pages[Object.keys(results.query.pages)[0]];
+                        loc.blurbs.wiki = page.extract || '<p>No Wikipedia results found</p>';
+                        loc.urls.wiki = 'http://en.wikipedia.org/wiki/' + page.title;
+                        LVM.setOverlay(loc);
+                    }
+                };
+            })(this),
+            (function(loc) {
+                return function(error) {
+                    var container = document.createElement('div');
+                    var p1 = document.createElement('p');
+                    p1.innerText = 'Wikipedia API has failed to load with the following error';
+                    var message = document.createElement('p');
+                    message.innerText = JSON.stringify(error);
+                    container.appendChild(p1);
+                    container.appendChild(message);
+                    console.log(container);
+                    loc.blurbs.wiki = container.innerHTML;
                     LVM.setOverlay(loc);
-                }
-            };
-        })(this));
+                };
+            })(this));
     }
     //Update and call the overlay
     LVM.setOverlay(this);
 };
+
+function toggleSearch() {
+    console.log('fuck fuck fuck');
+}

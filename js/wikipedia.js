@@ -22,7 +22,9 @@ var Wikipedia = function() {
         success: function(data, status) {
             console.log(data, status, this);
         },
-        error: function(error) { console.error(error); }
+        error: function(error) {
+            console.error(error);
+        }
     };
 
 }
@@ -31,12 +33,14 @@ var Wikipedia = function() {
  * Method to call a query to wikipedia
  *
  * @param {String} titles Title of Wikipedia Article to search for
- * @param {Function} callback Function to use in place of the default success callback
+ * @param {Function} success Function to use in place of the default success callback
+ * @param {Function} error Function to use in place of the default error callback
  * @method query
  */
-Wikipedia.prototype.query = function(titles, callback) {
+Wikipedia.prototype.query = function(titles, success, error) {
     var ajax = this.ajaxBase;
-    if(callback instanceof Function) ajax['success'] = callback;
+    if(success instanceof Function) ajax['success'] = success;
+    if(error instanceof Function) ajax['error'] = error;
 
     var url =   this.urlBase +
                 "&titles=" + titles;

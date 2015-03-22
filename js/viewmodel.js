@@ -50,10 +50,9 @@ var LocationViewModel = function() {
 LocationViewModel.prototype.setOverlay = function(location) {
     this.currentLocation(location);
     this.overlayTitle(location.name);
-    this.overlayContent(
-        location.blurbs.wiki +
-        '<a href="' + location.urls.wiki + ' "target="_blank" class="extinfo-link">Wikipedia</a>'
-    );
+    var content = location.blurbs.wiki;
+    if(location.urls.wiki) content += '<a href="' + location.urls.wiki + ' "target="_blank" class="extinfo-link">Wikipedia</a>';
+    this.overlayContent(content);
     if(!this.overlayOpen()) this.toggleOverlay();
 };
 

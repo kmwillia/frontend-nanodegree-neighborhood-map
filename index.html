@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Neighborhood Map</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- CSS -->
         <link rel="stylesheet" href="css/master.css" shim-shadowdom>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -41,6 +42,7 @@
                 <core-toolbar id="main_toolbar" class="medium-tall">
                     <paper-icon-button id="navicon" icon="menu" core-drawer-toggle></paper-icon-button>
                     <span data-bind="text: city.name" flex></span>
+                    <paper-icon-button id="searchicon" icon="search"></paper-icon-button>
                     <input id="main_placesearch" is="core-input" placeholder="Search Places" />
                     <paper-tabs class="bottom fit" selected=0 data-bind="foreach: filters" horizontal center layout>
                         <paper-tab data-bind="text: name, icon: icon"></paper-tab>
