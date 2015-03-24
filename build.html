@@ -1,5 +1,6 @@
 <!DOCTYPE html><html><head>
         <title>Neighborhood Map</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- CSS -->
         <style shim-shadowdom="">body {
     font-family: arial, verdana, sans-serif;
@@ -29,12 +30,25 @@ core-header-panel {
     color: #ffffff;
 }
 
+#search-container {
+    background: #1797d7;
+}
+
+#search-container.open{
+    width: 100%;
+}
+
 #main_placesearch {
     background: #f4f6f8;
-    max-width: 10em;
+    max-width: calc(50% - 40px);
+    display: none;
     padding: 5px 10px;
     border-radius: 17px;
     box-shadow: inset -1px -1px 3px 0 #4c4c4c;
+}
+
+#main_placesearch.open {
+    display: initial;
 }
 
 #drawer_locs:after {
@@ -25517,6 +25531,7 @@ polyfill-next-selector { content: '#tabsContent > *:not(#selectionBar)'; }
                 <core-toolbar id="main_toolbar" class="medium-tall">
                     <paper-icon-button id="navicon" icon="menu" core-drawer-toggle=""></paper-icon-button>
                     <span data-bind="text: city.name" flex=""></span>
+                    <paper-icon-button id="searchicon" icon="search"></paper-icon-button>
                     <input id="main_placesearch" is="core-input" placeholder="Search Places">
                     <paper-tabs class="bottom fit" selected="0" data-bind="foreach: filters" horizontal="" center="" layout="">
                         <paper-tab data-bind="text: name, icon: icon"></paper-tab>
@@ -25721,10 +25736,9 @@ var API_KEYS = {
 LocationViewModel.prototype.setOverlay = function(location) {
     this.currentLocation(location);
     this.overlayTitle(location.name);
-    this.overlayContent(
-        location.blurbs.wiki +
-        '<a href="' + location.urls.wiki + ' "target="_blank" class="extinfo-link">Wikipedia</a>'
-    );
+    var content = location.blurbs.wiki;
+    if(location.urls.wiki) content += '<a href="' + location.urls.wiki + ' "target="_blank" class="extinfo-link">Wikipedia</a>';
+    this.overlayContent(content);
     if(!this.overlayOpen()) this.toggleOverlay();
 };
 
@@ -25780,7 +25794,11 @@ $(function() {
 
     //Init map
     initializeMap();
+    var load = setTimeout(function() {
+        alert('Google Maps API failed to load within 5 seconds.\nPlease try again.');
+    }, 5000);
     googleMap.addEventListener('google-map-ready', function(e) {
+        clearTimeout(load);
         loadMapPlaces();
     });
 
@@ -25799,6 +25817,10 @@ $(function() {
     });
 
     //Attach events to search box
+    $('#searchicon').click(function(e) {
+        $('#main_placesearch').toggleClass('open');
+    });
+
     $('#main_placesearch').keyup(function(e) {
         LVM.searchString(e.target.value);
         LVM.filterLocations();
@@ -25862,7 +25884,7 @@ function loadMapPlaces() {
 
             LVM.addLocations(results);
             LVM.filterLocations();
-
+            //Get all pages of results (max 60 results, from 3 pages)
             if(nextPageToken.hasNextPage) {
                 setTimeout(function() {
                     nextPageToken.nextPage();
@@ -25891,7 +25913,7 @@ function Location(placeResult) {
     this.urls = {};
 
     //Create Google Maps marker for this
-    var markerIcon = {
+    this.markerIcon = {
         url: this.icon,
         scaledSize: new google.maps.Size(24,24),
         visible: this.types.anyExist(LVM.filter().keywords)
@@ -25901,7 +25923,7 @@ function Location(placeResult) {
         title: this.name,
         position: this.position,
         visible: true,
-        icon: markerIcon
+        icon: this.markerIcon
     });
     //Add Click to Marker
     google.maps.event.addListener(
@@ -25917,23 +25939,56 @@ function Location(placeResult) {
 
 //Click handler for Location
 Location.prototype.onClick = function() {
+    //Reset any changed markers
+    var locs = LVM.allLocations();
+    for(var i = 0; i < locs.length; i++) {
+        var loc = locs[i];
+        loc.marker.icon = loc.markerIcon;
+        loc.marker.setMap(null);
+        loc.marker.setMap(googleMap.map);
+    }
+    //Update this marker
+    this.marker.icon = null;
+    this.marker.setMap(null);
+    this.marker.setMap(googleMap.map);
+
     //Query data from API(s) if necessary
     if(!this.blurbs.wiki) {
         wiki = wiki || new Wikipedia();
-        wiki.query(this.name, (function(loc) {
-            return function(results, status) {
-                if(status === 'success') {
-                    var page = results.query.pages[Object.keys(results.query.pages)[0]];
-                    loc.blurbs.wiki = page.extract || '<p>No Wikipedia results found</p>';
-                    loc.urls.wiki = 'http://en.wikipedia.org/wiki/' + page.title;
+        wiki.query(
+            this.name,
+            (function(loc) {
+                return function(results, status) {
+                    if(status === 'success') {
+                        var page = results.query.pages[Object.keys(results.query.pages)[0]];
+                        loc.blurbs.wiki = page.extract || '<p>No Wikipedia results found</p>';
+                        loc.urls.wiki = 'http://en.wikipedia.org/wiki/' + page.title;
+                        LVM.setOverlay(loc);
+                    }
+                };
+            })(this),
+            (function(loc) {
+                return function(error) {
+                    var container = document.createElement('div');
+                    var p1 = document.createElement('p');
+                    p1.innerText = 'Wikipedia API has failed to load with the following error';
+                    var message = document.createElement('p');
+                    message.innerText = JSON.stringify(error);
+                    container.appendChild(p1);
+                    container.appendChild(message);
+                    console.log(container);
+                    loc.blurbs.wiki = container.innerHTML;
                     LVM.setOverlay(loc);
-                }
-            };
-        })(this));
+                };
+            })(this));
     }
     //Update and call the overlay
     LVM.setOverlay(this);
 };
+
+function toggleSearch() {
+    console.log('fuck fuck fuck');
+}
 </script>
         <script>/**
  * Wikipedia Object constructor
@@ -25959,7 +26014,9 @@ var Wikipedia = function() {
         success: function(data, status) {
             console.log(data, status, this);
         },
-        error: function(error) { console.error(error); }
+        error: function(error) {
+            console.error(error);
+        }
     };
 
 }
@@ -25968,12 +26025,14 @@ var Wikipedia = function() {
  * Method to call a query to wikipedia
  *
  * @param {String} titles Title of Wikipedia Article to search for
- * @param {Function} callback Function to use in place of the default success callback
+ * @param {Function} success Function to use in place of the default success callback
+ * @param {Function} error Function to use in place of the default error callback
  * @method query
  */
-Wikipedia.prototype.query = function(titles, callback) {
+Wikipedia.prototype.query = function(titles, success, error) {
     var ajax = this.ajaxBase;
-    if(callback instanceof Function) ajax['success'] = callback;
+    if(success instanceof Function) ajax['success'] = success;
+    if(error instanceof Function) ajax['error'] = error;
 
     var url =   this.urlBase +
                 "&titles=" + titles;
